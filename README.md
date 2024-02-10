@@ -15,8 +15,6 @@ TODO write me please!
 TODO write me please!
 
 ## Backlog
-### Workstation & Process Setup - 0.0.2
-* Configure Prettier
 ### First Core Feature - 0.1.0
 * Implement Socket.IO
 ### Loose End Improvements - 0.2.0
