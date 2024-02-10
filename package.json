@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --list-different src/**/*.ts",
-    "format:fix": "prettier --write src/**/*.ts"
+    "format:fix": "prettier --write src/**/*.ts",
+    "build": "tsc",
+    "start-from-dist": "node dist/index.js"
   },
   "author": "Patrick Browning III",
   "license": "MIT",
