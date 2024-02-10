@@ -12,7 +12,7 @@ const convertRawHeadersToDictionary = (rawHeaders: string[]): { [key: string]: s
     throw new Error('Raw headers length must be even');
   }
   for (let i = 0; i < rawHeaders.length; i += 2) {
-    const key = rawHeaders[i];
+    const key = rawHeaders[i].toLowerCase();
     const value = rawHeaders[i + 1];
     dictionary[key] = value;
   }
@@ -30,6 +30,7 @@ app.get('/listen', async (expressRequest, expressResponse) => {
       });
 
       const headers = convertRawHeadersToDictionary(icyResponse.rawHeaders);
+      console.log('headers', headers);
       expressResponse.setHeader('Content-Type', headers['content-type']);
 
       icyResponse.pipe(expressResponse);
