@@ -1,14 +1,15 @@
-import express, { response } from 'express';
+import express from 'express';
 import cors from 'cors';
 import icy from 'icy';
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT ?? 3000;
 
-const convertRawHeadersToDictionary = (rawHeaders: string[]): { [key: string]: string } => {
+const convertRawHeadersToDictionary = (icyResponse: any): Record<string, string> => {
+  const rawHeaders: string[] = icyResponse.rawHeaders;
   const dictionary = {};
-  if (rawHeaders.length % 2 == 1) {
+  if (rawHeaders.length % 2 === 1) {
     throw new Error('Raw headers length must be even');
   }
   for (let i = 0; i < rawHeaders.length; i += 2) {
@@ -21,24 +22,23 @@ const convertRawHeadersToDictionary = (rawHeaders: string[]): { [key: string]: s
 
 app.use(cors());
 
-app.get('/listen', async (expressRequest, expressResponse) => {
+app.get('/listen', (expressRequest, expressResponse) => {
   const icyClient = icy.get(expressRequest.query.url, icyResponse => {
-      icyResponse.on('metadata', (metadata) => {
-          var parsed = icy.parse(metadata);
+    icyResponse.on('metadata', (metadata) => {
+      const parsed = icy.parse(metadata);
 
-          console.log('metadata received', expressRequest.query.url, parsed);
-      });
+      console.log('metadata received', expressRequest.query.url, parsed);
+    });
 
-      const headers = convertRawHeadersToDictionary(icyResponse.rawHeaders);
-      console.log('headers', headers);
-      expressResponse.setHeader('Content-Type', headers['content-type']);
+    const headers = convertRawHeadersToDictionary(icyResponse);
+    expressResponse.setHeader('Content-Type', headers['content-type']);
 
-      icyResponse.pipe(expressResponse);
+    icyResponse.pipe(expressResponse);
   });
 
   icyClient.on('error', (error) => {
-      const statusCode = error.code === 'ECONNREFUSED' ? 503 : 500;
-      return expressResponse.status(statusCode).json();
+    const statusCode = error.code === 'ECONNREFUSED' ? 503 : 500;
+    return expressResponse.status(statusCode).json();
   });
 });
 

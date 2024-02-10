@@ -15,12 +15,7 @@ TODO write me please!
 TODO write me please!
 
 ## Backlog
-### Bare-Bones Minimum - 0.0.1
-* Commit to Github
-* Deploy to Heroku
 ### Workstation & Process Setup - 0.0.2
-* Configure linter
-* Write build pipeline
 * Configure Prettier
 ### First Core Feature - 0.1.0
 * Implement Socket.IO
