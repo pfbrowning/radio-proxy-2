@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT ?? 3000;
 
 const convertRawHeadersToDictionary = (
-  icyResponse: any
+  icyResponse: any,
 ): Record<string, string> => {
   const rawHeaders: string[] = icyResponse.rawHeaders;
   const dictionary = {};
