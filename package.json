@@ -1,6 +1,6 @@
 {
   "name": "radio-proxy-2",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "node.js proxy server for streaming shoutcast / icecast style audio",
   "main": "index.js",
   "scripts": {
