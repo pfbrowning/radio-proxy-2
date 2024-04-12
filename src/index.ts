@@ -1,13 +1,21 @@
 import express from "express";
 import cors from "cors";
 import icy from "icy";
+import { Server } from "socket.io";
+import { createServer } from "node:http";
 
-const app = express();
+const expressApp = express();
+const server = createServer(expressApp);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
 
 const PORT = process.env.PORT ?? 3000;
 
 const convertRawHeadersToDictionary = (
-  icyResponse: any,
+  icyResponse: any
 ): Record<string, string> => {
   const rawHeaders: string[] = icyResponse.rawHeaders;
   const dictionary = {};
@@ -22,14 +30,22 @@ const convertRawHeadersToDictionary = (
   return dictionary;
 };
 
-app.use(cors());
+io.on("connection", (socket) => {
+  console.log("a user connected");
+});
 
-app.get("/listen", (expressRequest, expressResponse) => {
+expressApp.use(cors());
+
+expressApp.get("/listen", (expressRequest, expressResponse) => {
   const icyClient = icy.get(expressRequest.query.url, (icyResponse) => {
     icyResponse.on("metadata", (metadata) => {
       const parsed = icy.parse(metadata);
+      const { url } = expressRequest.query;
+      const { StreamTitle: title } = parsed;
 
       console.log("metadata received", expressRequest.query.url, parsed);
+
+      io.emit("metadata", { url, title });
     });
 
     const headers = convertRawHeadersToDictionary(icyResponse);
@@ -44,4 +60,6 @@ app.get("/listen", (expressRequest, expressResponse) => {
   });
 });
 
-app.listen(PORT);
+server.listen(PORT, () => {
+  console.log(`server running at http://localhost:${PORT}`);
+});
