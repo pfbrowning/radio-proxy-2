@@ -1,5 +1,5 @@
 export const convertRawHeadersToDictionary = (
-  icyResponse: any
+  icyResponse: any,
 ): Record<string, string> => {
   const rawHeaders: string[] = icyResponse.rawHeaders;
   const dictionary = {};
