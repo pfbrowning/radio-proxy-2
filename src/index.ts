@@ -1,35 +1,33 @@
 import express from "express";
-import cors from "cors";
 import icy from "icy";
+import { Server } from "socket.io";
+import { createServer } from "node:http";
+import { convertRawHeadersToDictionary } from "./functions";
 
-const app = express();
+const expressApp = express();
+const server = createServer(expressApp);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
 
-const PORT = process.env.PORT ?? 3000;
+const port = process.env.PORT ?? 3000;
 
-const convertRawHeadersToDictionary = (
-  icyResponse: any,
-): Record<string, string> => {
-  const rawHeaders: string[] = icyResponse.rawHeaders;
-  const dictionary = {};
-  if (rawHeaders.length % 2 === 1) {
-    throw new Error("Raw headers length must be even");
-  }
-  for (let i = 0; i < rawHeaders.length; i += 2) {
-    const key = rawHeaders[i].toLowerCase();
-    const value = rawHeaders[i + 1];
-    dictionary[key] = value;
-  }
-  return dictionary;
-};
+io.on("connection", (socket) => {
+  console.log("a user connected");
+});
 
-app.use(cors());
-
-app.get("/listen", (expressRequest, expressResponse) => {
+expressApp.get("/listen", (expressRequest, expressResponse) => {
   const icyClient = icy.get(expressRequest.query.url, (icyResponse) => {
     icyResponse.on("metadata", (metadata) => {
       const parsed = icy.parse(metadata);
+      const { url } = expressRequest.query;
+      const { StreamTitle: title } = parsed;
 
       console.log("metadata received", expressRequest.query.url, parsed);
+
+      io.emit("metadata", { url, title });
     });
 
     const headers = convertRawHeadersToDictionary(icyResponse);
@@ -44,4 +42,6 @@ app.get("/listen", (expressRequest, expressResponse) => {
   });
 });
 
-app.listen(PORT);
+server.listen(port, () => {
+  console.log(`server running on port ${port}`);
+});
