@@ -35,7 +35,8 @@ TODO write me please!
 - Proxy key stream authentication
 
 ### Documentation - 1.0.0
-
 - Finish readme
 - Swagger
+- OWASP 10
+- Refactor
 - Set keywords in package.json
